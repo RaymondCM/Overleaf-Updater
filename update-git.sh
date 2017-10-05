@@ -3,21 +3,29 @@ echo "Infinite Loop for Pulling/Pushing Overleaf Repository [CTRL+C to Stop]"
 
 INTERVAL=5
 ITERATION=1
+VERBOSE=false
+
+while getopts ':v' flag; do
+  case "${flag}" in
+    v) verbose=true ;;
+    *) echo "Unexpected option ${flag}" ;;
+  esac
+done
 
 for(( ; ; ))
 do
-    echo "GitHub update iteration $ITERATION started (Elapsed time: $(($SECONDS))s)"
+    if [ "$verbose" == true ]; then echo "GitHub update iteration $ITERATION started (Elapsed time: $(($SECONDS))s)"; fi
     git fetch
 
     if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
-	echo "Changes on origin/master, pushing to github/master"
+	echo "Changes on origin/master, pushing to github/master (Iteration: $ITERATION, Elapsed: $(($SECONDS))s)"
         git pull origin master
     	git push github master
     else
-        echo "No Changes on origin/master"
+        if [ "$verbose" == true ]; then echo "No Changes on origin/master"; fi
     fi
 
-    echo "GitHub update iteration $ITERATION ended (Elapsed time: $(($SECONDS))s)"
+    if [ "$verbose" == true ]; then echo "GitHub update iteration $ITERATION ended (Elapsed time: $(($SECONDS))s)"; fi
     ITERATION=$(($ITERATION+1))
     sleep $INTERVAL
 done
