@@ -15,11 +15,16 @@ done
 for(( ; ; ))
 do
     if [ "$verbose" == true ]; then echo "GitHub update iteration $ITERATION started (Elapsed time: $(($SECONDS))s)"; fi
-    yes n | git fetch
+    
+    if [ "$verbose" == true ]; then 
+	yes n | git fetch --all
+    else
+        yes n | git fetch --all --quiet
+    fi
 
     if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
 	echo "Changes on origin/master, pushing to github/master (Iteration: $ITERATION, Elapsed: $(($SECONDS))s)"
-        yes n | git pull origin master
+        yes n | git reset --hard origin/master
     	yes n | git push github master
     else
         if [ "$verbose" == true ]; then echo "No Changes on origin/master"; fi
